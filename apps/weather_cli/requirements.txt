@@ -1,0 +1,4 @@
+inquirer
+rich
+requests
+python-dotenv

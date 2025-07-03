@@ -1,0 +1,6 @@
+{
+    "app_name": "Weather CLI",
+    "entry_point": "weather_cli.main",
+    "description": "A beautiful weather checker using the OpenWeatherMap API.",
+    "run_command": "python -m weather_cli.main"
+}

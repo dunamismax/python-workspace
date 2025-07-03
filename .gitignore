@@ -1,24 +1,101 @@
 # Python
-__pycache__/
+# Byte-code files
 *.pyc
-*.pyo
+__pycache__/
 *.pyd
+*.egg-info/
 .Python/
+
+# Distribution / packaging
+.env/
+.venv/
 env/
 venv/
-.venv/
-# IDEs
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg
+.installed.cfg
+*.mo
+*.pot
+*.po
+
+# Testing
+.pytest_cache/
+.coverage
+.hypothesis/
+htmlcov/
+.tox/
+.nox/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+# IDEs and editors
 .idea/
 .vscode/
-# OS
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
+.project
+.settings
+.loadpath
+.cproject
+.pydevproject
 .DS_Store
-# Build artifacts
-dist/
-build/
-*.egg-info/
-# Notebooks
-.ipynb_checkpoints/
+Thumbs.db
+ehthumbs.db
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+*.bak
+*.swp
+*~
+.fuse_hidden*
+.nfs*
+
+# OS generated files
+.DS_Store
+.Trashes
+._*
+
+# Web specific files (if applicable)
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.next/ # Next.js build output
+out/ # Next.js static export output
+node_modules/
+web.config # IIS
+.htacess # Apache
+
+# Docker
+Dockerfile.bak
+docker-compose.yml.bak
+
+# Environment variables
+.env
+.flaskenv
 
 # Database files
 *.db
+*.sqlite
 *.sqlite3
