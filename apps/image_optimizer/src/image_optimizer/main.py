@@ -1,38 +1,65 @@
+# apps/image_optimizer/src/image_optimizer/main.py
+
 import os
-import sys
+import argparse
 from rich.console import Console
 from rich.progress import Progress
-
-# Add the libs/image_processing/src to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'libs', 'image_processing', 'src')))
-from image_processing.image_utils import optimize_image
+from image_processing.image_utils import ImageProcessor
 
 console = Console()
 
-def process_images_in_folder(input_folder, output_folder, max_size=(1280, 720), quality=85):
-    """Processes all images in a folder, optimizing them and saving to an output folder."""
-    os.makedirs(output_folder, exist_ok=True)
-    console.print(f"[bold green]Processing images in[/bold green] [cyan]'{input_folder}'[/cyan] [bold green]and saving to[/bold green] [cyan]'{output_folder}'[/cyan]")
+def process_images(args):
+    """Processes all images in a folder based on the provided arguments."""
+    os.makedirs(args.output, exist_ok=True)
+    console.print(f"[bold green]Processing images in[/bold green] [cyan]'{args.input}'[/cyan]")
+    console.print(f"[bold green]Saving optimized images to[/bold green] [cyan]'{args.output}'[/cyan]")
 
-    image_files = [f for f in os.listdir(input_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
+    image_files = [f for f in os.listdir(args.input) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
 
     with Progress(console=console) as progress:
         task = progress.add_task("[green]Optimizing images...[/green]", total=len(image_files))
         for filename in image_files:
-            input_path = os.path.join(input_folder, filename)
-            output_path = os.path.join(output_folder, filename)
-            if optimize_image(input_path, output_path, max_size, quality):
-                progress.update(task, advance=1, description=f"[green]Optimized[/green] [yellow]'{filename}'[/yellow]")
-            else:
-                progress.update(task, advance=1, description=f"[red]Failed to optimize[/red] [yellow]'{filename}'[/yellow]")
+            input_path = os.path.join(args.input, filename)
+            output_path = os.path.join(args.output, filename)
 
-    console.print("[bold green]Image optimization complete![/bold green]")
+            try:
+                processor = ImageProcessor(input_path)
+                processor.resize(max_size=(args.max_width, args.max_height))
+
+                if args.grayscale:
+                    processor.apply_grayscale()
+                if args.sepia:
+                    processor.apply_sepia()
+                if args.watermark:
+                    processor.add_watermark(args.watermark)
+
+                if args.format:
+                    base, _ = os.path.splitext(output_path)
+                    output_path = f"{base}.{args.format.lower()}"
+                    processor.convert_format(output_path, format=args.format)
+                else:
+                    processor.save(output_path, quality=args.quality)
+
+                progress.update(task, advance=1, description=f"[green]Processed[/green] [yellow]'{filename}'[/yellow]")
+            except Exception as e:
+                progress.update(task, advance=1, description=f"[red]Failed[/red] [yellow]'{filename}': {e}[/yellow]")
+
+    console.print("[bold green]Image processing complete![/bold green]")
+
+def main():
+    parser = argparse.ArgumentParser(description="An advanced image optimization and processing tool.")
+    parser.add_argument("input", help="Input directory containing images to process.")
+    parser.add_argument("output", help="Output directory to save processed images.")
+    parser.add_argument("--max_width", type=int, default=1280, help="Maximum width for resizing.")
+    parser.add_argument("--max_height", type=int, default=720, help="Maximum height for resizing.")
+    parser.add_argument("--quality", type=int, default=85, help="Compression quality (1-100).")
+    parser.add_argument("--format", type=str, help="Convert images to a specific format (e.g., JPEG, PNG).")
+    parser.add_argument("--grayscale", action="store_true", help="Apply grayscale filter.")
+    parser.add_argument("--sepia", action="store_true", help="Apply sepia filter.")
+    parser.add_argument("--watermark", type=str, help="Add a text watermark to the images.")
+    
+    args = parser.parse_args()
+    process_images(args)
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        input_folder = sys.argv[1]
-        output_folder = sys.argv[2]
-        process_images_in_folder(input_folder, output_folder)
-    else:
-        console.print("[bold red]Usage: python -m image_optimizer.main <input_folder> <output_folder>[/bold red]")
-        console.print("[bold yellow]Example: python -m image_optimizer.main input_images output_images[/bold yellow]")
+    main()

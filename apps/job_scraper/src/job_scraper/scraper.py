@@ -1,62 +1,74 @@
-import requests
-from bs4 import BeautifulSoup
+# apps/job_scraper/src/job_scraper/scraper.py
+
 import csv
-import sys
+import argparse
 from rich.console import Console
 from rich.progress import Progress
+from shared_utils.scraper_utils import get_soup
 
 console = Console()
 
-def scrape_job_board(url, keyword, output_file="jobs.csv"):
-    """Scrapes a job board for listings and saves them to a CSV file."""
-    console.print(f"[bold green]Scraping[/bold green] [cyan]{url}[/cyan] [bold green]for keyword:[/bold green] [yellow]{keyword}[/yellow]")
+class JobScraper:
+    """A class for scraping job listings from Indeed.com."""
+
+    def __init__(self, site="indeed"):
+        self.site = site
+        self.base_url = "https://www.indeed.com"
+
+    def scrape(self, keyword, location, num_pages=1):
+        """Scrapes job listings for a given keyword and location."""
+        console.print(f"[bold green]Scraping {self.site} for '{keyword}' jobs in '{location}'...[/bold green]")
+        job_listings = []
+        with Progress(console=console) as progress:
+            task = progress.add_task("[green]Scraping pages...[/green]", total=num_pages)
+            for page in range(num_pages):
+                url = self.construct_url(keyword, location, page)
+                soup = get_soup(url, headers={"User-Agent": "Mozilla/5.0"})
+                if soup:
+                    job_listings.extend(self.parse_jobs(soup))
+                progress.update(task, advance=1)
+        return job_listings
+
+    def construct_url(self, keyword, location, page):
+        """Constructs the URL for the job search query."""
+        return f"{self.base_url}/jobs?q={keyword}&l={location}&start={page * 10}"
+
+    def parse_jobs(self, soup):
+        """Parses the job listings from the BeautifulSoup object."""
+        jobs = []
+        for job_card in soup.find_all("div", class_="job_seen_beacon") :
+            title = job_card.find("h2", class_="jobTitle").text.strip()
+            company = job_card.find("span", class_="companyName").text.strip()
+            link = self.base_url + job_card.find("a", class_="jcs-JobTitle")["href"]
+            jobs.append({"title": title, "company": company, "link": link})
+        return jobs
+
+    def save_to_csv(self, jobs, output_file):
+        """Saves the job listings to a CSV file."""
+        if not jobs:
+            console.print("[bold yellow]No jobs found to save.[/bold yellow]")
+            return
+
+        with open(output_file, "w", newline="", encoding="utf-8") as csvfile:
+            fieldnames = ["title", "company", "link"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(jobs)
+        console.print(f"[bold green]Scraping complete. Data saved to[/bold green] [cyan]{output_file}[/cyan]")
+
+def main():
+    parser = argparse.ArgumentParser(description="A powerful and extensible job scraper.")
+    parser.add_argument("keyword", help="The job keyword to search for.")
+    parser.add_argument("location", help="The location to search in.")
+    parser.add_argument("--site", default="indeed", help="The job board to scrape (currently only 'indeed' is supported).")
+    parser.add_argument("--pages", type=int, default=1, help="The number of pages to scrape.")
+    parser.add_argument("--output", default="jobs.csv", help="The output CSV file.")
     
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
-    except requests.exceptions.RequestException as e:
-        console.print(f"[bold red]Error fetching URL:[/bold red] {e}")
-        return
+    args = parser.parse_args()
 
-    soup = BeautifulSoup(response.text, 'html.parser')
+    scraper = JobScraper(site=args.site)
+    jobs = scraper.scrape(args.keyword, args.location, num_pages=args.pages)
+    scraper.save_to_csv(jobs, args.output)
 
-    job_listings = []
-    # This is a placeholder. You'll need to inspect the actual job board's HTML
-    # to find the correct tags and classes for job titles, companies, and links.
-    # Example: for job_card in soup.find_all('div', class_='job-card'):
-    #            title = job_card.find('h2', class_='job-title').text.strip()
-    #            company = job_card.find('span', class_='company-name').text.strip()
-    #            link = job_card.find('a', class_='job-link')['href']
-    #            job_listings.append({'title': title, 'company': company, 'link': link})
-
-    # For demonstration, let's add some dummy data
-    dummy_jobs = [
-        {'title': f'Software Engineer - {keyword}', 'company': 'Tech Corp', 'link': 'http://example.com/job1'},
-        {'title': f'Junior Developer - {keyword}', 'company': 'Startup Inc.', 'link': 'http://example.com/job2'},
-        {'title': f'Data Scientist - {keyword}', 'company': 'Data Insights', 'link': 'http://example.com/job3'},
-    ]
-
-    with Progress(console=console) as progress:
-        task = progress.add_task("[green]Processing job listings...[/green]", total=len(dummy_jobs))
-        for job in dummy_jobs:
-            job_listings.append(job)
-            progress.update(task, advance=1, description=f"[green]Found[/green] [yellow]'{job['title']}'[/yellow]")
-
-    with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['title', 'company', 'link']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-        writer.writeheader()
-        writer.writerows(job_listings)
-
-    console.print(f"[bold green]Scraping complete. Data saved to[/bold green] [cyan]{output_file}[/cyan]")
-
-if __name__ == '__main__':
-    if len(sys.argv) == 4:
-        url = sys.argv[1]
-        keyword = sys.argv[2]
-        output_file = sys.argv[3]
-        scrape_job_board(url, keyword, output_file)
-    else:
-        console.print("[bold red]Usage: python -m job_scraper.scraper <url> <keyword> <output_file>[/bold red]")
-        console.print("[bold yellow]Example: python -m job_scraper.scraper http://example.com/jobs Python jobs.csv[/bold yellow]")
+if __name__ == "__main__":
+    main()
