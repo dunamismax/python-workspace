@@ -1,12 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
-import sqlite3
+import os
+import sys
 
-# Assuming database_utils is in libs/database_utils/src/database_utils
-# You would typically add libs to PYTHONPATH or use a build system to make them discoverable
-# For this demo, we'll simulate the import.
-# from database_utils.db_connector import get_db_connection
+# Add the libs/database_utils/src to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'libs', 'database_utils', 'src')))
+from database_utils.db_connector import get_sqlite_connection
 
 app = FastAPI()
 
@@ -28,7 +28,7 @@ def get_db_connection():
 # Initialize database
 @app.on_event("startup")
 async def startup_event():
-    conn = get_db_connection()
+    conn = get_sqlite_connection(DATABASE_FILE)
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS tasks (
@@ -43,7 +43,7 @@ async def startup_event():
 
 @app.post("/tasks/", response_model=Task)
 async def create_task(task: Task):
-    conn = get_db_connection()
+    conn = get_sqlite_connection(DATABASE_FILE)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO tasks (title, description, completed) VALUES (?, ?, ?)",
                    (task.title, task.description, task.completed))
@@ -54,7 +54,7 @@ async def create_task(task: Task):
 
 @app.get("/tasks/", response_model=List[Task])
 async def read_tasks():
-    conn = get_db_connection()
+    conn = get_sqlite_connection(DATABASE_FILE)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM tasks")
     tasks = [dict(row) for row in cursor.fetchall()]
@@ -63,7 +63,7 @@ async def read_tasks():
 
 @app.get("/tasks/{task_id}", response_model=Task)
 async def read_task(task_id: int):
-    conn = get_db_connection()
+    conn = get_sqlite_connection(DATABASE_FILE)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
     task = cursor.fetchone()
@@ -74,7 +74,7 @@ async def read_task(task_id: int):
 
 @app.put("/tasks/{task_id}", response_model=Task)
 async def update_task(task_id: int, task: Task):
-    conn = get_db_connection()
+    conn = get_sqlite_connection(DATABASE_FILE)
     cursor = conn.cursor()
     cursor.execute("UPDATE tasks SET title = ?, description = ?, completed = ? WHERE id = ?",
                    (task.title, task.description, task.completed, task_id))
@@ -88,7 +88,7 @@ async def update_task(task_id: int, task: Task):
 
 @app.delete("/tasks/{task_id}", response_model=Dict[str, str])
 async def delete_task(task_id: int):
-    conn = get_db_connection()
+    conn = get_sqlite_connection(DATABASE_FILE)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
     conn.commit()

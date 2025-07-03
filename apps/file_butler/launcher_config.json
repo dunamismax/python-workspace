@@ -1,4 +1,4 @@
 {
     "description": "Organizes files by type",
-    "run_command": "python -m file_butler.main /tmp/test_files_for_file_butler"
+    "run_command": "python src/file_butler/main.py /tmp/test_files_for_file_butler"
 }

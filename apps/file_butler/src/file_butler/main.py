@@ -1,12 +1,13 @@
-import click
 import os
 import shutil
+from rich.console import Console
+from rich.text import Text
 
-@click.command()
-@click.argument('directory', type=click.Path(exists=True, file_okay=False, dir_okay=True))
+console = Console()
+
 def organize_files(directory):
     """Organizes files in the specified DIRECTORY into subdirectories based on file type."""
-    click.echo(f"Organizing files in: {directory}")
+    console.print(f"[bold green]Organizing files in:[/bold green] [cyan]{directory}[/cyan]")
 
     file_types = {
         "Documents": [".pdf", ".doc", ".docx", ".txt", ".rtf"],
@@ -29,21 +30,20 @@ def organize_files(directory):
                     destination_folder = os.path.join(directory, folder_name)
                     os.makedirs(destination_folder, exist_ok=True)
                     shutil.move(file_path, os.path.join(destination_folder, filename))
-                    click.echo(f"Moved '{filename}' to '{folder_name}/'")
+                    console.print(f"Moved [yellow]'{filename}'[/yellow] to [green]'{folder_name}/'[/green]")
                     moved = True
                     break
             if not moved:
                 other_folder = os.path.join(directory, "Others")
                 os.makedirs(other_folder, exist_ok=True)
                 shutil.move(file_path, os.path.join(other_folder, filename))
-                click.echo(f"Moved '{filename}' to 'Others/' (unclassified)")
+                console.print(f"Moved [yellow]'{filename}'[/yellow] to [green]'Others/'[/green] (unclassified)")
 
-    click.echo("File organization complete!")
+    console.print("[bold green]File organization complete![/bold green]")
 
 if __name__ == '__main__':
-    # Example usage: python -m file_butler.main /path/to/your/downloads
-    # For testing, create a dummy directory and some files:
-    # mkdir test_files
-    # touch test_files/doc.pdf test_files/image.jpg test_files/audio.mp3 test_files/script.py test_files/unknown.xyz
-    # python -m file_butler.main test_files
-    organize_files()
+    import sys
+    if len(sys.argv) > 1:
+        organize_files(sys.argv[1])
+    else:
+        console.print("[bold red]Error: Please provide a directory to organize.[/bold red]")

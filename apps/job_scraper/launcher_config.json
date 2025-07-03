@@ -1,4 +1,4 @@
 {
     "description": "Scrapes job listings",
-    "run_command": "python -m job_scraper.scraper"
+    "run_command": "python src/job_scraper/scraper.py http://example.com/jobs Python jobs.csv"
 }

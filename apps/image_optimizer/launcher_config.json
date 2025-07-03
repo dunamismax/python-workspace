@@ -1,4 +1,5 @@
 {
     "description": "Optimizes images in a folder",
-    "run_command": "python -m image_optimizer.main"
+    "run_command": "python src/image_optimizer/main.py /tmp/input_images_for_optimizer /tmp/output_images_for_optimizer",
+    "shared_libs": ["image_processing"]
 }

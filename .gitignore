@@ -18,3 +18,7 @@ build/
 *.egg-info/
 # Notebooks
 .ipynb_checkpoints/
+
+# Database files
+*.db
+*.sqlite3
