@@ -6,8 +6,8 @@ Welcome to my Python Monorepo. This repository centralizes diverse Python applic
 
 [![Language: Python](https://img.shields.io/badge/Language-Python-3776AB.svg)](https://www.python.org/)
 [![Web Framework: FastAPI](https://img.shields.io/badge/Web%20Framework-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
-[![CLI Framework: Click](https://img.shields.io/badge/CLI%20Framework-Click-FFC107.svg)](https://click.palletsprojects.com/)
-[![Web Scraping: Beautiful Soup](https://img.shields.io/badge/Web%20Scraping-Beautiful%20Soup-4CAF50.svg)](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+[![CLI Framework: Rich](https://img.shields.io/badge/CLI%20Framework-Rich-000000.svg)](https://rich.readthedocs.io/en/stable/)
+[![Interactive CLI: Inquirer](https://img.shields.io/badge/Interactive%20CLI-Inquirer-blue.svg)](https://github.com/magmax/python-inquirer)
 [![Image Processing: Pillow](https://img.shields.io/badge/Image%20Processing-Pillow-5C6BC0.svg)](https://python-pillow.org/)
 [![Database: SQLite](https://img.shields.io/badge/Database-SQLite-336791.svg)](https://www.sqlite.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/dunamismax/python-workspace/blob/main/LICENSE)
@@ -102,7 +102,6 @@ python-workspace/
 │   │           ├── __init__.py
 │   │           └── image_utils.py # Functions for image resizing, compression
 ├── scripts/                      # Utility scripts for monorepo management
-│   ├── setup_project.sh          # Sets up virtual environments and installs dependencies for all projects
 │   └── run_tests.sh              # Runs tests across all applications
 ├── .gitignore                    # Git ignore file
 ├── pyproject.toml                # Monorepo-level tooling configuration (Black, Ruff, Pytest)
@@ -130,8 +129,8 @@ This monorepo leverages a modern Python stack, optimized for performance and dev
 
 ### II. CLI & Automation
 
-- **CLI Framework:** [Click](https://click.palletsprojects.com/) (for `file_butler`)
-- **Interactive CLI:** [InquirerPy](https://inquirerpy.readthedocs.io/en/latest/) (for `cli_launcher`)
+- **CLI Framework:** [Rich](https://rich.readthedocs.io/en/stable/)
+- **Interactive CLI:** [Inquirer](https://github.com/magmax/python-inquirer)
 - **Image Processing:** [Pillow](https://python-pillow.org/) (for `image_optimizer` and `libs/image_processing`)
 
 ---
@@ -149,7 +148,7 @@ cd python-workspace
 ./scripts/setup_project.sh
 
 # Run the CLI Launcher to select and run an application
-python -m apps.cli_launcher.src.cli_launcher.main
+./run_launcher.sh
 ```
 
 ---
@@ -192,7 +191,7 @@ Ensure you have the following installed:
    Use the `cli_launcher` to interactively select and run any application:
 
    ```bash
-   python -m apps.cli_launcher.src.cli_launcher.main
+   ./run_launcher.sh
    ```
 
    Alternatively, you can manually activate an app's virtual environment and run its main script:
@@ -216,7 +215,7 @@ A central command-line tool that scans the `apps/` directory, lists detected app
 
 ### [File Butler](apps/file_butler) - Command-Line Interface (CLI) Tool
 
-A practical utility that organizes files in a specified directory into subdirectories based on their file type (e.g., `.pdf` to `Documents/`, `.jpg` to `Images/`). Built using the `Click` framework.
+A practical utility that organizes files in a specified directory into subdirectories based on their file type (e.g., `.pdf` to `Documents/`, `.jpg` to `Images/`).
 
 **Example Usage (via CLI Launcher):**
 Select `file_butler` and provide a directory path (e.g., `/tmp/my_downloads`).
@@ -310,27 +309,6 @@ The monorepo includes several automation scripts to streamline development:
   - Creates virtual environments for all apps and libs.
   - Installs all dependencies from `requirements.txt` files.
   - Ensures `pyenv` is initialized for correct Python version usage.
-
-### Development
-
-- **`cli_launcher`** - Interactive application runner
-  - Scans for all applications in `apps/`.
-  - Presents a selectable list to the user.
-  - Activates the correct virtual environment and runs the selected application.
-
-### Testing
-
-- **`run_tests.sh`** - Execute test suites
-  - Iterates through all applications and libraries.
-  - Activates their respective virtual environments.
-  - Runs `pytest` (if installed and configured for the project).
-
-### Script Features
-
-All scripts include:
-
-- **Error Handling**: Proper exit codes and error messages.
-- **Virtual Environment**: Automatic activation when needed.
 
 ---
 
