@@ -88,6 +88,13 @@ python-workspace/
 │   │       └── image_optimizer/
 │   │           ├── __init__.py
 │   │           └── main.py       # Main script for the image optimizer
+│   ├── weather_cli/              # Command-Line Interface (CLI) tool for weather checking
+│   │   ├── launcher_config.json  # Configuration for the CLI launcher
+│   │   ├── requirements.txt      # Dependencies (e.g., requests, inquirer, rich, python-dotenv)
+│   │   └── src/
+│   │       └── weather_cli/
+│   │           ├── __init__.py
+│   │           └── main.py       # Main script for the weather checker
 ├── libs/                         # Directory for shared libraries and packages
 │   ├── database_utils/           # Utility functions for database interactions
 │   │   ├── requirements.txt      # Dependencies (if any, e.g., for a specific DB driver)
@@ -124,7 +131,8 @@ This monorepo leverages a modern Python stack, optimized for performance and dev
 - **Virtual Environments:** `venv`
 - **Web Framework:** [FastAPI](https://fastapi.tiangolo.com/) (for `todo_api`)
 - **Database:** [SQLite](https://www.sqlite.org/docs.html) (for `todo_api`)
-- **HTTP Requests:** [Requests](https://requests.readthedocs.io/en/latest/) (for `job_scraper`)
+- **HTTP Requests:** [Requests](https://requests.readthedocs.io/en/latest/) (for `job_scraper`, `weather_cli`)
+- **Environment Variables:** `python-dotenv` (for `weather_cli`)
 - **HTML Parsing:** [Beautiful Soup 4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) (for `job_scraper`)
 
 ### II. CLI & Automation
@@ -240,6 +248,13 @@ A script that scans a folder for images, resizes them to a maximum dimension, an
 
 **Example Usage (via CLI Launcher):**
 Select `image_optimizer`. It will create a dummy image and process it, saving optimized versions to an `output_images` folder.
+
+### [Weather CLI](apps/weather_cli) - Interactive Weather Checker
+
+A command-line tool that fetches current weather and a 5-day forecast from the OpenWeatherMap API. It prompts the user for a zip code and presents the weather information in a visually appealing format using Rich, including emojis and a concise daily forecast table.
+
+**Example Usage (via CLI Launcher):**
+Select `weather_cli`. Enter a zip code (e.g., `90210`). Ensure your OpenWeatherMap API key is set in `apps/weather_cli/.env`.
 
 ---
 
