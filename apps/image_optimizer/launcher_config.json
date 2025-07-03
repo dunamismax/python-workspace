@@ -1,0 +1,4 @@
+{
+    "description": "Optimizes images in a folder",
+    "run_command": "python -m image_optimizer.main"
+}

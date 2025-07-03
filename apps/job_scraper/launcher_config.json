@@ -1,0 +1,4 @@
+{
+    "description": "Scrapes job listings",
+    "run_command": "python -m job_scraper.scraper"
+}
