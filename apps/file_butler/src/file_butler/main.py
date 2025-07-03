@@ -1,13 +1,15 @@
 # apps/file_butler/src/file_butler/main.py
 
-import os
-import json
 import argparse
+import json
+import os
+
 from rich.console import Console
 from rich.table import Table
 from shared_utils.file_operations import move_file
 
 console = Console()
+
 
 class FileButler:
     """A class for organizing files based on their type."""
@@ -18,20 +20,28 @@ class FileButler:
     def load_config(self, config_path):
         """Loads the file type configuration from a JSON file."""
         try:
-            with open(config_path, 'r') as f:
+            with open(config_path, "r") as f:
                 return json.load(f)
         except FileNotFoundError:
-            console.print(f"[bold red]Error: Configuration file not found at {config_path}[/bold red]")
+            console.print(
+                f"[bold red]Error: Configuration file not found at {config_path}[/bold red]"
+            )
             raise
         except json.JSONDecodeError:
-            console.print(f"[bold red]Error: Invalid JSON in configuration file {config_path}[/bold red]")
+            console.print(
+                f"[bold red]Error: Invalid JSON in configuration file {config_path}[/bold red]"
+            )
             raise
 
     def organize_directory(self, directory, recursive=False, dry_run=False):
         """Organizes the files in the specified directory."""
-        console.print(f"[bold green]Starting file organization in:[/bold green] [cyan]{directory}[/cyan]")
+        console.print(
+            f"[bold green]Starting file organization in:[/bold green] [cyan]{directory}[/cyan]"
+        )
         if dry_run:
-            console.print("[bold yellow]Running in dry-run mode. No files will be moved.[/bold yellow]")
+            console.print(
+                "[bold yellow]Running in dry-run mode. No files will be moved.[/bold yellow]"
+            )
 
         moved_files = {}
         if recursive:
@@ -82,13 +92,20 @@ class FileButler:
 
         console.print(table)
 
+
 def main():
     parser = argparse.ArgumentParser(description="A powerful and customizable file organizer.")
     parser.add_argument("directory", help="The directory to organize.")
-    parser.add_argument("--config", default="file_types.json", help="Path to the JSON configuration file.")
-    parser.add_argument("--recursive", action="store_true", help="Organize files in subdirectories recursively.")
-    parser.add_argument("--dry-run", action="store_true", help="Simulate the organization without moving files.")
-    
+    parser.add_argument(
+        "--config", default="file_types.json", help="Path to the JSON configuration file."
+    )
+    parser.add_argument(
+        "--recursive", action="store_true", help="Organize files in subdirectories recursively."
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Simulate the organization without moving files."
+    )
+
     args = parser.parse_args()
 
     try:
@@ -96,6 +113,7 @@ def main():
         butler.organize_directory(args.directory, args.recursive, args.dry_run)
     except Exception as e:
         console.print(f"[bold red]An unexpected error occurred: {e}[/bold red]")
+
 
 if __name__ == "__main__":
     main()

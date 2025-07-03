@@ -11,9 +11,11 @@ TABLE_SCHEMA = """
     completed BOOLEAN NOT NULL DEFAULT 0
 """
 
+
 def get_db():
     """Returns a DatabaseManager instance for the To-Do app."""
     return DatabaseManager(DATABASE_FILE)
+
 
 def initialize_database():
     """Initializes the database and creates the tasks table."""

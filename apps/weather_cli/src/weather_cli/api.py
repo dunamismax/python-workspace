@@ -1,15 +1,17 @@
 # apps/weather_cli/src/weather_cli/api.py
 
 import os
+
 import requests
-from rich.console import Console
 from dotenv import load_dotenv
+from rich.console import Console
 
 load_dotenv()
 console = Console()
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 BASE_URL = "http://api.openweathermap.org/data/2.5"
+
 
 class WeatherAPI:
     """A class for interacting with the OpenWeatherMap API."""

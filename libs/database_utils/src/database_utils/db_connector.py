@@ -2,9 +2,11 @@
 
 import sqlite3
 from contextlib import contextmanager
+
 from rich.console import Console
 
 console = Console()
+
 
 class DatabaseManager:
     """A robust context manager for SQLite database connections."""
@@ -18,7 +20,9 @@ class DatabaseManager:
         try:
             self.conn = sqlite3.connect(self.db_path)
             self.conn.row_factory = sqlite3.Row
-            console.log(f"[bold green]Database connection opened to:[/bold green] [cyan]{self.db_path}[/cyan]")
+            console.log(
+                f"[bold green]Database connection opened to:[/bold green] [cyan]{self.db_path}[/cyan]"
+            )
             return self
         except sqlite3.Error as e:
             console.log(f"[bold red]Error connecting to database:[/bold red] {e}")
@@ -28,7 +32,7 @@ class DatabaseManager:
         """Closes the database connection."""
         if self.conn:
             self.conn.close()
-            console.log(f"[bold green]Database connection closed.[/bold green]")
+            console.log("[bold green]Database connection closed.[/bold green]")
 
     def execute_query(self, query, params=()):
         """Executes a given SQL query (e.g., INSERT, UPDATE, DELETE)."""
@@ -68,11 +72,12 @@ class DatabaseManager:
         self.execute_query(query)
         console.log(f"Table [bold cyan]'{table_name}'[/bold cyan] created or already exists.")
 
+
 @contextmanager
 def get_sqlite_connection(db_path):
     """
     A context manager for a simple, one-off SQLite database connection.
-    
+
     This is suitable for simple scripts or functions where a full DatabaseManager
     class might be overkill.
     """

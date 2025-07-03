@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
 
-from .database import get_db, initialize_database
+from .database import get_db
 
 app = FastAPI(
     title="To-Do List API",
@@ -17,11 +17,6 @@ class Task(BaseModel):
     title: str
     description: str | None = None
     completed: bool = False
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize the database when the application starts."""
-    initialize_database()
 
 @app.post("/tasks/", response_model=Task, status_code=201)
 async def create_task(task: Task):
@@ -73,6 +68,8 @@ async def delete_task(task_id: int):
 
 if __name__ == "__main__":
     import uvicorn
+    from .database import initialize_database
+    initialize_database()
     print("To run the API, use the command:")
     print("uvicorn todo_api.main:app --reload --port 8000")
     print("Access the API documentation at http://127.0.0.1:8000/docs")

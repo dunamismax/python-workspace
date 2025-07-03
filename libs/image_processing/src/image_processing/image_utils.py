@@ -1,10 +1,12 @@
 # libs/image_processing/src/image_processing/image_utils.py
 
-from PIL import Image, ImageDraw, ImageFont
-from rich.console import Console
 from typing import Tuple
 
+from PIL import Image, ImageDraw, ImageFont
+from rich.console import Console
+
 console = Console()
+
 
 class ImageProcessor:
     """A class for performing various image processing operations."""
@@ -66,19 +68,26 @@ class ImageProcessor:
         console.log("Applied sepia filter.")
         return self
 
-    def add_watermark(self, text: str, font_path: str = None, font_size: int = 36, opacity: int = 128):
+    def add_watermark(
+        self, text: str, font_path: str = None, font_size: int = 36, opacity: int = 128
+    ):
         """Adds a text watermark to the image."""
         draw = ImageDraw.Draw(self.image)
-        try:
-            font = ImageFont.truetype(font_path, font_size)
-        except IOError:
-            console.log(f"[yellow]Warning: Font not found at {font_path}. Using default font.[/yellow]")
+        if font_path:
+            try:
+                font = ImageFont.truetype(font_path, font_size)
+            except IOError:
+                console.log(
+                    f"[yellow]Warning: Font not found at {font_path}. Using default font.[/yellow]"
+                )
+                font = ImageFont.load_default()
+        else:
             font = ImageFont.load_default()
 
         text_width, text_height = draw.textbbox((0, 0), text, font=font)[2:]
         x = self.image.width - text_width - 10
         y = self.image.height - text_height - 10
-        
+
         draw.text((x, y), text, font=font, fill=(255, 255, 255, opacity))
         console.log(f"Added watermark: '{text}'")
         return self

@@ -14,6 +14,9 @@ class JobScraper:
     def __init__(self, site="indeed"):
         self.site = site
         self.base_url = "https://www.indeed.com"
+        self.headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
+        }
 
     def scrape(self, keyword, location, num_pages=1):
         """Scrapes job listings for a given keyword and location."""
@@ -23,7 +26,7 @@ class JobScraper:
             task = progress.add_task("[green]Scraping pages...[/green]", total=num_pages)
             for page in range(num_pages):
                 url = self.construct_url(keyword, location, page)
-                soup = get_soup(url, headers={"User-Agent": "Mozilla/5.0"})
+                soup = get_soup(url, headers=self.headers)
                 if soup:
                     job_listings.extend(self.parse_jobs(soup))
                 progress.update(task, advance=1)
